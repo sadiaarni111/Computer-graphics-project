@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Houses from outside.js app</title>
+    <style>
+    </style>
+</head>
+
+<body>
+
+    <script type="module">
+
+	import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js';
+
+	import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/DRACOLoader.js';
+	import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
+
+	const manager = new THREE.LoadingManager();
+	const textureLoader = new THREE.TextureLoader(manager);
+
+	var wall=textureLoader.load("https://images.unsplash.com/photo-1610422218546-42b7f1f84dbd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=627&q=80");
+
+	const scene = new THREE.Scene();
+
+    const renderer = new THREE.WebGLRenderer();
+    renderer.shadowMap.enabled=true;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+    renderer.setClearColor(0x000000, 1);
+    renderer.clear();
+
+       
+    const camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000); //new THREE.PerspectiveCamera(FOV, viewAspectRatio, zNear, zFar)
+    const orbit = new OrbitControls(camera, renderer.domElement);
+    const loader = new THREE.TextureLoader();
+    camera.position.set(0,10,10);
+    scene.background = loader.load( 'https://threejs.org/examples/textures/uv_grid_opengl.jpg' );
+    
+
+	let walltexture1=null;
+	let walltexture2=null;
+	let cottageRoofTexture;
+	let cottageWallTexture;
+	let wallTexture;
+	let skytexture=null;
+
+	function loadtexture()
+	{
+		const loader = new THREE.TextureLoader();
+		walltexture1= loader.load('https://previews.123rf.com/images/nutnai/nutnai1809/nutnai180900189/109658056-white-brick-wall-texture-and-background-house-wall.jpg');
+		walltexture2= loader.load('https://upload.wikimedia.org/wikipedia/commons/c/c7/Red_brick_texture_house_wall.jpg');
+		cottageRoofTexture=loader.load('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCL83PkOBC26Uy4xxxdtYZ9tY_6ZMzG-Uws9mUnyktereSo3zu08xWapT4PBifSl5Fz5Q&usqp=CAU');
+		cottageWallTexture=loader.load('https://previews.123rf.com/images/surabky/surabky1110/surabky111000101/11018228-texture-of-cottage-wall-made-from-leaves.jpg');
+		skytexture = loader.load('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAoHCBUWFRgWFhYZGRYaHBwfHBocHB4fHh4cHR8cHBkaHBweIS4lHCErIRwaJzgnKy8xNTU1HCU7QDs0Py40NTEBDAwMBgYGEAYGEDEdFh0xMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMTExMf/AABEIALUBFwMBIgACEQEDEQH/xAAaAAADAQEBAQAAAAAAAAAAAAABAgMABAUH/8QAMxAAAQMDAgQFBAIDAQADAQAAAQIRIQAxQQNREmFxgSKRobHwBDLB0RPhQlLxYgUUgnL/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8A+lhCTBSOIMbMCBzGY9qsRphlKZRB8JMkOGg8xW/kd0kO1iHB6b0yU8LkvwkWa3RqBFLYEpJg2IeGdmEnNVbiYktu2evzFTSsCCJyWdxgnlNSUlYhwUvBN+n6oOhaSmQxEf8ASBnnU9QJU4+1QALBpEsfQ3qqEuHMFsR22O3nW/jiHcSHcsaBULUkSC27OfIZ6VRGoDeOrYqaEmEkWw+Blu9ZaUi4Hcct6Bl6wdgZF4onUeG8v3WC9gW3vQQpRwczDUE1vxJKTNiFbY9aK9RQg8JTu7daqvTBv5t+aQfTwxPEOd+r3egxQCRBjyNSWvgaHexMZyT2rfxK/wAXg5PsRTKCdmJ5FiaCq3uw9/l6CUTfttRCb8TACXoKSRl+vIelqABJdnY5iOvKhppWHclQJy2eg+c6ZDXgK6uO2aPAHeR3jytQJpAh0sAHNueffypzpWb5Dbx/VAkliCxBke4aspJvJ3u/lmgRIUCAZ2I9iKCtUzDttF2PeqJUlQkSMFnoLRzLHnFqAqVDgdopU6xcAp72qfBtDiTPqB51kochy5SYM9PY+dBcbkiKBS+RaIJ/M0AiSCS0RAbfzceVQGkpD8KwJUQlg3inrf3oOnTvnof6pdZbB3A838qKNTiAMA5t7vWWsO3hf15BqBkar2b2+ZpVqWC7OBdnJbpvU9PUaFH8dw8j/ldAY2oOdOmR9r8IwWs2M7VUrIGA12kNWQcl3sZmrP8A1Qcn1GrwyT4Td4aw3qn8aVcKnJIEfutwlJmQcYfOagXSpk8I7zaGHbbegYpEnxHdiQfINRp1rV/o4zu9agpL8qVayCxBbvUgo2nEvHlcUx4iJPzvQGSwIDc2osMu1rx0NRKAoS4I5sfQyKfUTAb0uOxoKFCenseo3rLXF/KgEk4meVQV9OUuQXuWKo7NbFB0qLtLbt8jFDTIc784cYpEqZmI5jM8800KuPnI5oDqBV0kA8w7+VKAVCCxeZccxQ4yIbzJLip8SnBEh7ZA/NBVKlAsbm3OhxkqaB3FFK1G6XZ8gHkaVZSSHd+jTs4oLAP1IvLVHUQbhMm8kD0+RTLBImGNw+OVN/I7bYMt3oIIVwqJLuWw9XGr/sIxFBMGSfmKxODHq+xagxS0pf38v1RBh29aKQWcMfnpS6agXKWvOziCG3BegT+QFTZiCwf906iIxLA2Yw1YpBuA49uVIlIB/wDJuD6NtQVAfnU0jheH2HqAcd6YeEwiNw3tek1CD4VNMMc9QelAyQLiP1+f7rKQVSwi365UiQoNIZ9j03YF6qweWegilcgpDEQRg+nLFOhRVIYbXPYvTKS/Q2PzNcenqlCzxqUUlmiNmtBc70HYECQRHT4/Wpa/EkggAAXYOWsG2ra2iTZRHW3wUmoqAS/FEzIFxHWg6CtKoVmzipf/AF8OQORp0FJ52E+kGm/lALFgdnoOJWgQriCyl4UCIOOJjnmK7dJKhfz/AKxUFKSXYvwy0mWeDexoaX1qSooBcpZ84zQda2ttU9ZDhi3KKuGe8iKkpBtzu/f3oF0NRRHvM1qTU+mz4huA5nk1agqovmfmKCSYcP7j5vVydiIqC9RW0b70BIBZ/wBPU+EfaFZbdssH9qOitK0gumcD9Gxqeuh/EnhJDyf6oMsaoCeHhLXJzs3OqpBLl2Ox9qTS12cKBHMyJ+X60/EoGRxA8vdzQBGhAuWs5sO1YoAkk+/qbUNVJxGHyH8377Vvp1K/yYj/AMi/VzQOmzMe5rcDC7SaI1cNOzc/1UuFSklwwBcMZ3f3oH0NcKJDd9+7UE6wJPhN9i39VBaCFBbrtO3kLm9b+dlkkkoLbcIxa9B2Nt8apoBBuW+ZrJUQY+02j0szVgFvBAHSfe1AeKXE79KZKTghqVy8iWxU0oKTJJk/jGaApcBlKAUDi3K42oqOTPSXHSmCyXDRZy3XB7UCi7gdj886ApAukxyMCp6qgC6uFgHcs/Py/NMNJi0+dFA4YaPmKAKSosUl8saYp4gyk5zNT0VpJIDgpPT5DRT6iy0SXER77NQOhJAgvypeNwCQQR5ipav1HAAVAs4kW71dWplwU/Hmgkr6hKWfzfycUVrBcADmSzHq/Sk1tVABHDaORfHXFMnUQSWIdpGQOfnQU0tYEOCCN6OoIuw6AiufW1EoZyc2l9gaqrW4kkIIC2hw7cyM9KAjScHiDHrB2NRCuFPiYBP+s8O5ban+nZLJKnIDfqOlFemH8JD4f2HKgloo4QVoSkk2KRcfior+kRqELT4VoMHqJSWxNqvoQ7xuM8o7U/BPElzggG+0YoFGk52UGf8A5tFVYqH3dwM0IUeKQRFKNLhJKTGzZ5bUFNJSt+Ibi9q1WQej1qDjUtTg8QCspkiebbi9URrO74w483GKyEuAQ0s5TBfpnvWSoP8AaDsaBEoSDbwlyG3N/PemKkqHhIM+ux50wSOjcqLNDOOQ9aBEKP8AqI8+YrKVxPw7WINxt603C5Yt+W/NZelsbT++UzQTRqeLxeE8zgbc5oqRwkuoMSLmXszvQWgK6jsR+6BQQk8S3TH3M4csLdqCwQkGINT42LMGOXHlTJ4QWJc2d5ptNIEGT6tbvQc6ApMiUHGRtmwqp4Vf4gnp5vQTpBypKiCIN2fMU+oFXBAoB9OYlIDR8em1AL25/vlUOBXFxA3vt861TgJcf5b/APKBwBA9n9qXgyC7t0+WraS92n550zMRJ6fn1oESQYe/v+6OklQdy4iCADzMXdx5U2ogEERNS0dQj7ha5PvQOpRDZ6SH8npkL4s3kfmlCkkODGDilOil7sTMZOaCOrplJKxxQHIDMWxe9dKBAIbn/dAJCpBfBY+hrkH0ikqdBgwQpyKDtGpLEVltYQf+VzpQoEcS4fYRVyBBTfd470GSpw4kZA/e4pFpSo8JBYvk/vnTlRDt89Joan04UxCikxY7YnGKCY+nATwllAWfbZ80DpB3QQCIt6EVZGmlgFMe1MoNZn7UEUJCrh1Xv6gYzVSQQxDHmz1zK1V8XEwYMGeSCzk7T7GuviJPJvnWgX5gRypB9OkFw7mXct5PaisF5DkWlu1RQvhKglJEOxJAcvlooOgEv7tb2oguGVL9Q/6oE8IDqfn2zSDWIJDO2Y9aApPDGLB/O/y1amUCbM4wbEda1AEhj4RkuLPzrFFyL8m71tVxPC49WzaXoeEupJI3aD3BE0CcS3gAi8n0tToMjiHia+KmvWITu25kjdmg1danALfO1BJZMQ077/M0dFbgghlgdHpgDZ3Ew3nXOvSBU8gzwspvn9UFlcJEg7kbdPKnBCk2LEbfDXIgqC/GAoXBYODA/VdYQHiPSgjqjheCXGA5aNhcbUPpdZGqHCreeQ5BDh2quoki0jIu/ffnXOUoUCSiXlOTta9B1oXLG5p+EVxkkFwSoNYS3/NqojUKh+nvze1BUjnfyoLguKkMcLhWx9WNULluIEZBBjp8ign/AC/+XHIR32NU/jcbC7XrBQmBW4w4Y+IQ27UCaYAiff8A5TlxPnW4gfEO/wDYrAtZhyxQYIFwBLP1plpBH5xSgK5H9U0SA4PzegUpN/OspIcFyOTxSfyF2Y92zkb0F/TPPCxYiDMt+qCn8gMEAkYh6Kkux71FWlaPPF2I596bS1FCFJbmJFA6grBfkaZKQZHkKxUe1AA3cNQDgaC7G00oBSwJ4ueacvsG9ur0iVKa77ix9KDOOIlTcNgyncRcNEuM108AZrV5a9RY40hDw4BUGO4FyPLIq302opmAPRRnmxzQX3zNhHy9cuulQWSAZAHRiWPd/SujUJdxBh7SPhq1x/VBDQSVJZXr/dOrRBx5fIoJQ1i3xy1FRmT+i/p3oCNMFIfGc1qKR2/fvWoAspOWfmfgqX8Vw/hiAwq4REl/KaRaHy3vQRUgj7vFsSLDaKQEJPEH5sGcH/YEb10EExBteIvEUy0EZjsfxQZGpyashQP+ppNIsGeHjYDaqKEOAD6UHL9TqEKbgdG4OCLt6VbT1UtzDc3oKAYnB3BgWYuaidRQhKEsLSQ2YYM1B1p1QR+I9KTjID3Tz/NYOJADG4iP3UkrSFSGJ8iTdqCqr7E2h6VZh2IIwG7teiNVBISWdnS8lt03NOpgf6oFOok59aCyoRcb5HSiEhn8Ic9jScbYn5fyoKuTe4HagFv1uN6kQrifiYljw55tTpCcg3uY/wCUDPsPaRzpVILeEMfTypl6YULvtvSAhKmIJcXMvyOHoJySy4tYt63NOlwWJJTgxVNQkEMCXHVqKRDWbYzQbiTDgEb1kN/ibYegqQC7H44ihqBxzoAVKBcB4kc6ZOqWEQfmKRGor/yehv8Ao0RqTMHdqB0KLZ+cq3DlJHzagtRghQHqKygoOw270GWDsDsSLPilRqAQQAeRqgW7gljtbpSqWLvyIaXiaA8Tuw22870pYMTId450iuKSGi3MdHgvVEA4cbhs7v50GUEmAR+e00EoIDgv/wBkHegUuxeUkkRPMb05BYEW2t3H6oMHc88N+XocUtu8cm9KJg/n+qQpZi7N1by2oBqJHOeZBjnmtVAUq+4A+3UVqBfpNcqBdnHx6TXSXcX3jyn5esvRAU+J3mHZs1jqpFwQcQ3rQKjiKhsAXe94/PnT/UKWlPEli2LP51y6/wBQlCgo4DKBJhLjxcmia7HCwkgkbAH49BHT1FlvAQWnia7DYzW0fqFMoqSBLcTuCMGBNUVoHi4gosQA1smQ0vyqitKbsfQ9aAqXln//AJkUuokHcc6dgB0/NZQiO72oONPGlR4lpKWf7C7Z8QN74roQoLG/qDsbVjpiDAl7ZFIvTI8SFMWkGx7Y7UCK0OIMQ5S8hwRmC+1WCk2fGK50fVLSWWl7MQD5mrLckFp5XAoJIHASwYHr5Gqo1GLKN7P+D5Uy0mI9faJpT4gUlJty8wd6BlaQOSM8/nOgtDwfnOamhwQApy9rQTM5HbFVWRLu2b/igRQIyEqt12vagtbGSo2YXOeXxqo4sT0zUf4QfAqQftcW7fIoOoKByzzQKAP29S0wuZDDHsRtRS8gv850DkRiphbPD2/OabgZ7kUP4ocW/G3v50FWDQwNSU+R5n0pQhjxB+n7iqhIMgznn2oMCBFgbdaATjfnvWAAh4bNT1NIFhPIgyO/4oCtXDJkjO4pl8KmUz9PeL0NDWulRLjLX6b05vw49WoESkA8JUZdh1raqOEgyRYs8DBpVZCmAcEOZwXMbv5VP/7gS7qAKQ5uzbxQdBW4PCH5ksPOtxgRnEE0mn9SFJCkgHiyJfMHNMGmaDMDE8jatooAcPc7+g7VkrSSEgglnBbqHBsLnzoHTIyAOQDRy6e1BPU0kh4JcwAQJubkbVqdWkS4BIdjDQcs9agb+YGGIOMilDgkKDjr5Q/rTqAFiZpFpFzcTg+RNBlfTpUXfcdtm+WqI40RHABBGDkEG2MzO0342ul+bN1rKSo4DRv7YxQcKv5eFPiJMl0oYkZEuxn0q2n9UuUwoDJcHooNVErKTKoszUVo09QBUKBYcQ7tNBVU3LPG/nRQ9iJ3byk1yq0iiUhxkG7Pgt71QF7BrZwThjQZemZBPMMWPW9/3TaaQ0k9Xy8O3amKGyo0qkEkKEHOXFAdRJL4LWp0Ltnpil4FH/J+RFRToFNg7lzOeRvgRQXWwuSObtSp1YDTJke96P8AIAWJbq3sZpOMpJBA4TkPf8UDliQ4b0/7mmOsNn6cvalCnjhPe37NMUlrD8figRbNEZFTTrEmUEbgY2IphBZiRE8jcE5xRKlAlgWNjt5maCadRjI8Ls7gs73mrlMDAZutTRqE3Qeobz2/5TIW0Etscd9qDaoLQWN/jUiFrfGcgg/kVVBB53HlelXpBXUG4LEeVA/8qYLtSq1UgyzjtS/woMFi9KPp0j/EAb7UF1KBsZwaUKwfPn0qiAGYVIpD0CK1OEyI+etOvTC7KDizQWPQ02pqNiMv+a5V6qCDdCgCH4SGaXlnAu/90HQAsfcxT0n1d6Vd3CgMMc/qqI1MAuel6XUQSCAQCOT+hxQZBSA0CH6ncb1jpIVmd80oQZBtLQM7bUitFJLcSgrlf/lAxStJPCxF5yZeRY2vVAtR/wAOoJx+S9ZIa5fnTlNiz+9BJaWnGQXcbZty6VqKywuUswfH9XatQMdQj7ktzFqB4VXYjp6GiVggyOHr+a5laPCeJyxMuYbcNAag6koTcT1Jil1SofbeuVWksPwqHNg4u8h3SYaN6Y6i0gEo4t2YMMlntnJoKnUe8LFuf6qel9aOLhUAFe/Ter6KiQ8TIINxh9i1Q12dKgQrhLkFnFw42/7QWR9QhRIcFoIyDz2xTK0woQQPIiofU6aVlJKLAnjLDhHI3HapaKFaZaVIJMGThpvDetB06vHgsYkBxBxIvak/nIg/dMmOlq6CQRYNzDVLVgOk/wD5weXKgGotREgp8jzjenClHZXT0oKWW+2cZ86np66nMMLs/n2igVSSQ/EXuxaDl+RqhCnAskixYudg+KGlqEqYEFLeZLWwBcXokBIyM9Dkf8oJr0yQxeBhh0LRanGqpJAUoSIhpzVErBFj+qjqqCkkOLfaY7E0HQlbhiz2NMJGxqGgsGCGU1UY7jrQFCgeo+TvQUrBT3qZWHkiffpO1BYH2qVB7f8AaBkoINvCcPL9Ky9AXHoaOmktk93dvagkG/pv1mgCChTKtv8AkHFFQa1jNABKheQX23cHtU1IDjwhSTsc3scNsaC+lqIMg3+dqVaXh+hbFTQhAJ4YVs9XJJEt5er4oAhZAkSMb/qsFH/Ujyb+qXS6CebtQ1tLiEk9ifwzUDoRDt7ON6IWmzzh81DQUsEhowXBjExTfVoJD/aRII9RQMSQT4wLM5zsRjtW1SpoIEXZ23Id/wA0mutJSHSVSC6ZbY8rNG9In6grA8PDYsqxDtg8ge4oH0NWHcnfry2FXRrBQgi3Q43rl8BUWPCu5Sfd6KVqsQ435364oH1ClSCkFpZ2cQeTPatXCE6iSrhD8SnIA8MBjInY2oUHcdHTHiYAtsPl6ZoHD9pw5aamSgy3CYuNsJxf3qi1gEFmf1P4oMgNH7H5tVlo5x0pQQqL+/8AVZBAJmOZtQcvAmQQuW8JDJi3x6pqmEyyf8gzx+KtqDiBDH53rnSFgAYEyOIkGGLM0y/KgcaqQGJ4hvt52iivS4r/ADYvRCiU4BhmD1DgIceJhk/iYoLjRIuT85mhqaYcc4frjpQGn/7Pu9ixpUpBDKDF97t1mgA1gHSCkrBYDdw6Qd6olCndz0i3eo8SEQQzWJERZ1b9aZWo/CpJvbrdn6PQZYDso8nDzyIZqyiE+EltnJMCbmsVkgpWwIzd+2KogFQaI7v+qALJDcIYZak4VsB9wtIuOozVkBYgANtPoaCk7jqzUHItKkKCtncPDPYF3frXajUCgCCCOh96RCgoFJ+5NwaknQKC6Gy4x/VB0puKVZYMWABv6vymooUhSrsrZ+xpykpJPF3JxOLCgdDO5In33FFR4TIg1Jf02UgE59y01XSLpGOVAmpp8U3EEQ/SlSpIcFUTybys9WcggPjtypFrBLKSQbP/AHQYIBIImP7l6CVCwct2b4fagVNcsMnla9VIBD3PKKBEkuYJ2LfmqIc2aDao6S5MuCXTu12rLQQoLeDePKgZSFJMJ4h1ZvOmSsmFBvK21HUWBnrJHJ4uKZCgQMj5NAmmrF2+WNHVQ7Oeha1ROmlByAS4a1MvWCSEu7mGk+Wz550DrQDsVDtNS/lt4SFE9Ja/ONqRSQnxlklI8UkJbm8YvR+o+qCUpUT/AKtF3YM/c0HTAt5j81qJKWHOtQRRpNZnxtL4pVPZTB75nB9M+dD6dnZIcObq8Ufdeb+9dHAXcgZ7fPxQcYStJiUlwXgDYjf+qKNHClcSxdmDx6QxroWg75sM+lqRSRBnsHJ/IagkhKYfjAhiTD88+dWRxBw7u/ibGH6VigSC9rP+Odc6GSSGUwwbEb39DQdKVAtJfpHRqZeiSzd653ZylT5Z3jkCa6EahUAQQO99qCISUQJgWZwMRkU6C1yeQIkPgbUy/qGHiwR6wCKgEKSYYpLX/JzQXWl3Sx5OY86KC7WfYgxXOV6iXUpIOwTlOxex+cqpp66VSD1E3vbBoKTtHqD2rkXxIJKVgJylVp2rscXyIP8AZqB1Ev8Aa/NnfyegulZh2L2IpULli07Az1NS0igQzNvFzEPR1DwqBBABiz9M0Dr05BGzF7NTIjL/AI6tSr1RkFt2yMWpV6ZEEcSDuZHSgTV+l/yBKTy/IzTJJII4gTcRtTpXsrsxpdHUJJGRguI5b0GREyQd8fsVNSSlUnwmxdu3zatq6bTZzN71RCASxJLYP6z1oDpqC44nY+0YvL1RYAhv6rl1dFIU8gHIJDHpjFWRp44n9/Ogy9Q3+4NBTdi2D8ignT2cFrO+7ENaabiSUkTFwRYbjlR4QZBctd/cDegkjXSC6mctY/unSUgqY3lj61y6g01AcYZWmeJN2BeDsR1qoQsqLpCkKSXCmJBN09CDblQdJCmi/n5WxUNJamcJUJLhTPs9zBZ+9OlISQziwAPsNqoVEXAbmaAKS4hlDYzQOknYPHpWGi0uQHs8HExF8bUNRDSLRORN3+WoETphQcJBBDXhpHQwfaqa/wBGhaOAoSUEMUsLfNq5UBSSQm0QUkRlmAG1dKC93Bxsf3QcKvrNPTWlC1cPE/C5Z2DlL7jbYPvRp1/SIII1NMaibB2USILniZp9hRoFP1SgoNkE+TBjvf0r0eKO1atQcP8A8lrFCTqCSGjG1H6LXOonisZ5zZ/SjWoH09biUtJH2kB+od+VbX03NyLVq1A2n9gBlh7Crp0UtaNsVq1BzHQCVcAJbEu3cuT51NX1CuF4tkP1861ag5v/AIr/AOROqdQFIA01qSGN+EAuer2oKTwutPh+5RAsTF61ag9HSHEl7QCecZrJkbRitWoOX61LMqCRuBvjam+n+pUopcx64zQrUDp1zPI108Z4wnBFatQMUgOQLGlW3EHALn2sa1agywx5RHWoa4EKzGesUK1BtRTB+5G/KrJ0gSGj1961agyfEHL+fOuNPhIayixHcT61q1B3nRFqRSCAVAzzD4rVqAK0wQ9i3a21LokKCCUiWPRw9atQFWrwkJAgvnZqbQ1HSSzMWbsDWrUB1ZY8q50huFrGCOrW2rVqAnQP8hSFFlBw88Jcu3XhFatWoP/Z');
+		wallTexture=walltexture1;
+
+	}
+	
+    loadtexture();
+
+	function creatcottage(){
+            
+    let houseGroup = new THREE.Group(); 
+	houseGroup.position.set(0, 0,0); 
+	
+	let geometry = new THREE.BoxGeometry(5,5,5); 
+	let mesh = new THREE.MeshStandardMaterial({map: cottageWallTexture}); 
+	let cube = new THREE.Mesh(geometry, mesh); 
+	let edgeLine = new THREE.BoxBufferGeometry( 5, 5, 5 ); 
+	let edges = new THREE.EdgesGeometry( edgeLine ); 
+	let line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff} ) ); 
+	cube.position.set(0,0,4);
+	line.position.copy(cube.position); 
+	houseGroup.add(cube);
+	scene.add(houseGroup); 
+
+
+	let roof = new THREE.ConeGeometry(4.5,3,0); 
+	let roofMaterial = new THREE.MeshBasicMaterial({map: cottageRoofTexture});
+	let roofMesh = new THREE.Mesh(roof, roofMaterial);
+	roofMesh.position.set(0, 4, 3.7);
+	houseGroup.add(roofMesh);
+
+	
+	let door = new THREE.PlaneBufferGeometry(2,3,2);
+	let doorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff,
+	map: loader.load('https://static.vecteezy.com/system/resources/previews/002/482/604/large_2x/wood-door-texture-free-photo.JPG')
+	});
+	let doorMesh = new THREE.Mesh(door, doorMaterial);
+	doorMesh.position.set(0,-0.94,6.6);
+	houseGroup.add(doorMesh);
+
+
+	let windowright = new THREE.PlaneBufferGeometry(1,2,1);
+	let windowMaterial = new THREE.MeshBasicMaterial({color: 0xffffff,
+	map: loader.load('https://previews.123rf.com/images/pasgen/pasgen1511/pasgen151100013/47954601-old-wooden-windows-wood-texture.jpg')
+	});
+	let windowMesh = new THREE.Mesh(windowright, windowMaterial);
+	windowMesh.position.set(2.6,0,4);
+	windowMesh.rotation.y=Math.PI / 2;;
+	houseGroup.add(windowMesh);
+
+
+	let windowleft = new THREE.PlaneBufferGeometry(1,2,1);
+	let windowMeshleft = new THREE.Mesh(windowleft, windowMaterial);
+	windowMeshleft.position.set(-2.6,0,4);
+	windowMeshleft.rotation.y=-Math.PI / 2;;
+	houseGroup.add(windowMeshleft);
+
+	return houseGroup;
+
+    }
+
+
+	function createHouse(){
+	
+	let houseGroup = new THREE.Group(); 
+	houseGroup.position.set(0, 0,0); 
+	let geometry = new THREE.BoxGeometry(15,10,9); 
+	const loader = new THREE.TextureLoader();
+	let mesh = new THREE.MeshStandardMaterial({
+
+	map: wallTexture
+	}); 
+	let cube = new THREE.Mesh(geometry, mesh);
+	cube.castShadow=true;
+	
+	let edgeLine = new THREE.BoxBufferGeometry( 5, 5, 5 ); 
+	let edges = new THREE.EdgesGeometry( edgeLine ); 
+	let line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) ); 
+	cube.position.set(0,0,4);
+	line.position.copy(cube.position); 
+	houseGroup.add(line);
+	houseGroup.add(cube);
+	scene.add(houseGroup); 
+
+
+	let Topgeometry = new THREE.BoxGeometry(15,2,9);  
+	let topcubemat = new THREE.MeshStandardMaterial({
+	map: skytexture    }); 
+	let TopCube = new THREE.Mesh(Topgeometry, topcubemat);
+	houseGroup.add(TopCube);
+	TopCube.position.set(0,5.9,4);
+	
+	let door = new THREE.PlaneBufferGeometry(4,5,2);
+	let doorMaterial = new THREE.MeshBasicMaterial({color: 0xffffff,
+	map: loader.load('https://thumbs.dreamstime.com/b/door-texture-dark-walnut-color-glass-modern-interior-d-render-front-view-187759419.jpg')  
+	});
+	let doorMesh = new THREE.Mesh(door, doorMaterial);
+	doorMesh.position.set(0,-2.3,8.6);
+	houseGroup.add(doorMesh);
+
+	//let fontwindow = new THREE.PlaneBufferGeometry(10,3,2);
+	//let fontwindowMaterial = new THREE.MeshBasicMaterial({color: 0xffffff,
+	//map: loader.load('http://www.textures4photoshop.com/tex/thumbs/frosted-glass-texture-thumb21.jpg')
+	//});
+	//let fontwindowMesh = new THREE.Mesh(fontwindow, fontwindowMaterial);
+	//fontwindowMesh.position.set(0,2.5,8.6);
+	//houseGroup.add(fontwindowMesh);
+
+
+	let windowright = new THREE.PlaneBufferGeometry(3,2,1);
+	let windowMaterial = new THREE.MeshBasicMaterial({color: 0xffffff,
+	map: loader.load('https://live.staticflickr.com/603/21998082634_4739f3148f.jpg')
+	});
+	let windowMesh = new THREE.Mesh(windowright, windowMaterial);
+	windowMesh.position.set(7.6,-2,4);
+	windowMesh.rotation.y=Math.PI / 2;;
+	houseGroup.add(windowMesh);
+
+
+	let windowleft = new THREE.PlaneBufferGeometry(3,2,1);
+	let windowMeshleft = new THREE.Mesh(windowleft, windowMaterial);
+	windowMeshleft.position.set(-7.6,-2,4);
+	windowMeshleft.rotation.y=-Math.PI / 2;;
+	houseGroup.add(windowMeshleft);
+
+
+	let windowleftTop = new THREE.PlaneBufferGeometry(5,3,1);
+	let windowMeshleftTop = new THREE.Mesh(windowleftTop, windowMaterial);
+	windowMeshleftTop.position.set(-7.6,2.5,4);
+	windowMeshleftTop.rotation.y=-Math.PI / 2;;
+	houseGroup.add(windowMeshleftTop);
+
+
+
+	let windowrightTop = new THREE.PlaneBufferGeometry(5,3,1);
+	let windowMeshrightTop= new THREE.Mesh(windowrightTop, windowMaterial);
+	windowMeshrightTop.position.set(7.6,2.5,4);
+	windowMeshrightTop.rotation.y=Math.PI / 2;;
+	houseGroup.add(windowMeshrightTop);
+
+
+
+	return houseGroup;
+
+	}
+
+	const cottage=creatcottage();
+
+	let home=createHouse();
+
+	home.castShadow=true;
+	home.position.y=5;
+	cottage.position.set(15,2.5,0);
+
+    
+
+	//const geometry = new THREE.PlaneGeometry( 100, 100 );
+	//const material = new THREE.MeshStandardMaterial( {color: 0xffffff, side: THREE.DoubleSide,
+	//map: loader.load('https://previews.123rf.com/images/praewpailin/praewpailin2101/praewpailin210100016/163474878-green-grass-texture-for-background-green-lawn-pattern-and-texture-background-close-up-.jpg')
+	//} );
+	//const plane = new THREE.Mesh( geometry, material );
+	//plane.rotation.set(Math.PI / 2,0,0);
+	//plane.receiveShadow=true;
+	//scene.add( plane );
+
+
+    const geometry = new THREE.PlaneGeometry( 100, 100 );
+	const material = new THREE.MeshStandardMaterial( {color: 0xffffff, side: THREE.DoubleSide,
+	map: loader.load('https://t3.ftcdn.net/jpg/02/23/11/00/360_F_223110064_NucncyEHHRdcKIbQwYUKe06HwBqvSlhf.jpg')
+	} );
+	const plane = new THREE.Mesh( geometry, material );
+	plane.rotation.set(Math.PI / 2,0,0);
+	plane.receiveShadow=true;
+	scene.add( plane );
+
+
+    const Directionallight = new THREE.DirectionalLight( 0xffffff, 1 );
+	Directionallight.position.set( 30 , 10, 0 );
+	scene.add( Directionallight );
+
+	const ambientlight = new THREE.AmbientLight( 0x404040 ); // soft white light
+	scene.add( ambientlight );
+
+
+	orbit.target = new THREE.Vector3(0,0,0); 
+	orbit.maxPolarAngle =  Math.PI/2; 
+	orbit.minDistance = 10; 
+	orbit.maxDistance = 250; 
+	orbit.zoomSpeed = 0.3; 
+	orbit.rotateSpeed = 0.3; 
+
+
+	let r=true;
+	let l=true;
+
+    document.onkeydown = (e) => {
+				e = e || window.event
+				if (e.keyCode == '38') { // up arrow
+					
+				    var direction = new THREE.Vector3();
+					camera.getWorldDirection( direction );
+				
+				}
+				else if (e.keyCode == '40') {
+					// down arrow
+					//var direction = new THREE.Vector3();
+					//camera.getWorldDirection( direction );
+					//distance = -1;
+					//camera.position.add( direction.multiplyScalar(distance) );
+				}
+				else if (e.keyCode == '37') {
+				// left arrow
+					//camera.rotation.y += 1
+                  //  theta+=60;
+                  r=true;
+				}
+				else if (e.keyCode == '39') {
+                    l=true;
+				}
+				renderer.render( scene, camera );
+			}
+
+
+
+    scene.background = loader.load( 'https://t3.ftcdn.net/jpg/03/56/62/18/360_F_356621844_02EwpDTxw9lOCA8B52cagLvT8j7zczbS.jpg' );
+
+    function animate(){
+	
+            cottage.rotation.x +=0.0;
+            cottage.rotation.y +=0.0;
+
+            Directionallight.position.x = 20 * Math.sin(Date.now() / 240);
+            Directionallight.position.z = 20 * Math.cos(Date.now() / 240);
+            if(r==true){
+                camera.position.x = 20* Math.sin(Date.now() / 240);
+				camera.position.z = 20* Math.cos(Date.now() / 240);
+				camera.lookAt(0,10,0);
+				r=false;
+            }
+             if(l==true){
+                camera.position.x = 20* Math.sin(Date.now() / -240);
+				camera.position.z = 20* Math.cos(Date.now() / -240);
+				camera.lookAt(0,10,0);
+				l=false;
+            }
+            
+			renderer.render(scene,camera);
+    }
+
+    let onmousedown = function(){
+           if(wallTexture==walltexture1){
+		   
+                console.log("yoo1");
+                wallTexture=walltexture2;
+				
+            }
+            else if(wallTexture==walltexture2){
+			
+                console.log("yoo2");
+                wallTexture=walltexture1;
+				
+            }
+            
+            scene.remove( home );
+            home=createHouse();
+            home.position.y=5;
+
+        }
+
+
+    document.addEventListener("click", onmousedown, false);
+
+	renderer.setAnimationLoop(animate);
+
+
+    // Add this at end of main.js and add all code above this so that whatever things we are adding will be automatically rendered
+	renderer.render(scene, camera); 
+
+
+    renderer.render(scene, camera);
+
+</script>
+
+   <!--<script src="script.js"></script> -->
+</body>
+</html>
